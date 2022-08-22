@@ -54,7 +54,7 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 
-/*  test('Render the input field and button,also the title input should have the value of the especifi game',async()=>{
+ test('Render the input field and button,also the title input should have the value of the especifi game',async()=>{
         render(
           <MemoryRouter initialEntries={["/games/1"]}>
       <UpdateGames />
@@ -78,7 +78,7 @@ afterAll(() => server.close());
 
   test('Dont load if not logged in', async () => {
     server.use(
-      rest.get('/login', (req, res, ctx) => {
+      rest.get('/login', (req, res, ctx) => { 
         return res(ctx.status(401),ctx.json('Not logged in'));
       })
     ); 
@@ -89,7 +89,7 @@ afterAll(() => server.close());
       )
      expect(screen.getByText('You do not have permission to acesse this page')).toBeInTheDocument()
    
-  })  */
+  }) 
 
 
   test('Update the game and return the new array with updated array',async()=>{
