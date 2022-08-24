@@ -1,5 +1,7 @@
 import { useState,useEffect } from "react";
 import axio from 'axios'
+import { LocationDisplay } from '../App';
+import {Link} from 'react-router-dom'
 
 const Nav=()=>{
     const [users,setUsers]=useState(false)
@@ -20,14 +22,14 @@ const Nav=()=>{
     return(
         <div>
 <ul>
-    <li>Login</li>
-    <li>List</li>
-    <li>Add</li>
+  {!users&&<Link to='/login'> <li>Login</li></Link>} 
+   <Link to='/home'> <li>List</li></Link>
+   <Link to='/submit'> <li >Add</li></Link>
     {users&& <li >Logout</li>}
     {users&& <li >Account</li>}
 
 </ul>
-
+<LocationDisplay/>
         </div>
     )
 

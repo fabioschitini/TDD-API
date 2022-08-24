@@ -1,20 +1,25 @@
 import { useState } from "react";
 import axio from 'axios'
+import { LocationDisplay } from '../App';
+import {useNavigate} from 'react-router-dom'
+
 const Login=()=>{
     const [username,setUsername]=useState()
     const [password,setPassword]=useState()
     const [submitMessage,setSubmitMessage]=useState()
     const [errorMessage,setErrorMessage]=useState()
-
+    const [usersList,setUsersList]=useState('yolo')
+    const navigate=useNavigate()
 const submit=async ()=>{
     try{
-
         const response=await axio.post('/login',{username,password})
-        setSubmitMessage("Logged in Suceffuly!")
-    }
+      setUsersList(JSON.stringify(response.data.users))
+      navigate('/home')
+     }
     catch(e){
+        console.log(e.response.data)
         setErrorMessage(e.response.data.errorMessage)
-    console.log('fudeuuu')
+        console.error(e.message)
     }
 }
     return(
@@ -25,7 +30,8 @@ const submit=async ()=>{
 <button onClick={submit}>Submit</button>
 <p>{submitMessage}</p>
 <p>{errorMessage}</p>
-
+<div  style={{display:'none'}} data-testid="test">{usersList}</div>
+<LocationDisplay/>
         </div>
     )
 }

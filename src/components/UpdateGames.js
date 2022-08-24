@@ -1,6 +1,6 @@
 import { useState,useEffect } from "react";
 import axio from 'axios'
-import {useParams,useLocation ,Link} from 'react-router-dom'
+import {useLocation ,Link,useNavigate} from 'react-router-dom'
 import { LocationDisplay } from '../App';
 
 
@@ -12,7 +12,7 @@ const UpdateGames=()=>{
     const [games,setGames]=useState('yolo')
     const location=useLocation()
     const filteredId=location.pathname.replace('/games/','');
-console.log('yoloooooooooooooooooooo')
+    const navigate=useNavigate()
     useEffect(()=>{
         const fetchUsers=async ()=>{
             try{
@@ -43,12 +43,25 @@ const submit=async ()=>{
         setSubmitMessage('Succesully updated!')
         console.log(response.data.games,'updated response')
         setGames(JSON.stringify(response.data.games))
+        navigate('/home')
     }
     catch(e){
         console.error(e.message)
         setErrorMessage('Server Error!')
     }
 }
+
+const Delete=async()=>{
+    try{
+        const response=await axio.delete(`games/${filteredId}`,{title,id:filteredId})
+        setGames(JSON.stringify(response.data.games))
+        navigate('/home')
+     }
+     catch(e){
+         console.error(e.message)
+         setErrorMessage('Server Error!')
+     }
+    }
 
     return(
         <div>
@@ -61,6 +74,7 @@ const submit=async ()=>{
       {!users&&<h1>You do not have permission to acesse this page</h1>}  
       {submitMessage}
       <div  style={{display:'none'}} data-testid="test">{games}</div>
+      <button onClick={Delete}>Delete</button>
       <LocationDisplay/>
         </div>
     )

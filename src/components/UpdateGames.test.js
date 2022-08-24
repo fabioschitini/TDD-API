@@ -19,7 +19,6 @@ const allGames = [
   
   ]
 
-
 const server = setupServer(
     rest.put('/games', (req, res, ctx) => {
       try{
@@ -42,39 +41,46 @@ const server = setupServer(
  
     }),
     rest.get('/games', (req, res, ctx) => {
-      return res(ctx.json({allGames }));
+      try{
+        return res(ctx.json({allGames }));
+      }
+      catch(e){
+        console.error(e.message)
+      }
    }),
    rest.get('/login', (req, res, ctx) => {
-    return res(ctx.json({ users }));
-  })
+    try{
+      return res(ctx.json({ users }));
+    }
+    catch(e){
+      console.error(e.message)
+    }
+  }),
+    rest.delete('/games/:id',(req,res,ctx)=>{
+      try{
+        let uptadedGames=allGames.filter(game=>game.id!==req.params.id)
+        return res(ctx.json({games:uptadedGames}))
+      }
+      catch(e){
+        console.error(e.message)
+      }
+    })
   );
 
   beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
+  afterEach(() => server.resetHandlers());
+  afterAll(() => server.close());
 
-
- test('Render the input field and button,also the title input should have the value of the especifi game',async()=>{
+  test('Render the input field and button,also the title input should have the value of the especifi game, and ',async()=>{
         render(
           <MemoryRouter initialEntries={["/games/1"]}>
       <UpdateGames />
     </MemoryRouter>
         )
+      expect(screen.getByTestId('location-display')).toHaveTextContent('/games/1')
       expect(await screen.findByDisplayValue("Elden Ring")).toBeInTheDocument()
       expect( screen.getByText(/submit/i)).toBeInTheDocument();
   }) 
-
-   test('full app rendering/navigating', async () => {
-    render(
-      <MemoryRouter initialEntries={["/games/1"]}>
-      <UpdateGames />
-    </MemoryRouter>
-      )
-     expect(screen.getByTestId('location-display')).toHaveTextContent('/games/1')
-   fireEvent.click(screen.getByText(/eucaceta/i))
-     expect(screen.getByTestId('location-display')).toHaveTextContent('/idk')
-  }) 
-
 
   test('Dont load if not logged in', async () => {
     server.use(
@@ -91,17 +97,27 @@ afterAll(() => server.close());
    
   }) 
 
-
-  test('Update the game and return the new array with updated array',async()=>{
+  test('Update the game and return the new array with updated array and then navigate to /home',async()=>{
     render(
       <MemoryRouter initialEntries={["/games/1"]}>
       <UpdateGames />
     </MemoryRouter>
     )
- //const yolo= await screen.findByLabelText("Title")
     const nameField=await  screen.findByLabelText('Title')
     const button= await screen.findByText(/submit/i)
     fireEvent.change(nameField,{target:{value:'Sekiro'}})
     fireEvent.click(button);
     await waitFor(() =>{expect( screen.getByTestId('test')).toHaveTextContent('{"id":"1","title":"Sekiro"}')})
+    expect(screen.getByTestId('location-display')).toHaveTextContent('/home')
   })
+
+  test('When you click the delete button,delete the game and return new array', async() => {
+    render(<MemoryRouter initialEntries={['/games/1']}> <UpdateGames /> </MemoryRouter>)
+    const button= await screen.findByText(/delete/i)
+    fireEvent.click(button)
+    await waitFor(() =>{expect( screen.getByTestId('test')).not.toHaveTextContent('{"id":"1","title":"Elden Ring"}')})
+
+      /* await waitFor(() =>{expect(screen.getByText('Are you sure that you want to Delete this token?')).toBeInTheDocument()})
+      await waitFor(() =>{ expect(screen.getByText('Yes')).toBeInTheDocument() })
+      await waitFor(() =>{expect(screen.getByText('No')).toBeInTheDocument()}) */
+    });

@@ -13,7 +13,12 @@ const allGames = [
 
 const server = setupServer(
   rest.get('/games', (req, res, ctx) => {
-    return res(ctx.json({ games: allGames }));
+    try{
+      return res(ctx.json({ games: allGames }));
+    }
+    catch(e){
+      console.error(e.message)
+    }
   })
 );
 
@@ -23,16 +28,12 @@ afterAll(() => server.close());
 
 test('renders the main heading, the search input', () => {
     render(<Show  />);
-  
-    expect(screen.getByRole('heading')).toHaveTextContent('Find Game');
-        expect(screen.getByPlaceholderText('Enter the game name...'))
-      .toBeInTheDocument();
+    expect( screen.getByText(/find game/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Enter the game name...')).toBeInTheDocument();
   });
 
-  
 test('fetches and displays all games', async () => {
     render(<Show />);
-  
     const listItems = await screen.findAllByRole('listitem');
     expect(listItems).toHaveLength(3);
     expect(listItems[0]).toHaveTextContent('Elden Ring');
@@ -40,13 +41,10 @@ test('fetches and displays all games', async () => {
     expect(listItems[2]).toHaveTextContent('Blodborne');
   });
 
-  test('succefully filter games while typing', async () => {
+test('succefully filter games while typing', async () => {
     render(<Show />);
-
     const input = screen.getByPlaceholderText('Enter the game name...');
-  
     fireEvent.change(input, { target: { value: 'elde' } });
-
     const listItems = await screen.findAllByRole('listitem');
     expect(listItems).toHaveLength(1);
     expect(listItems[0]).toHaveTextContent('Elden Ring');

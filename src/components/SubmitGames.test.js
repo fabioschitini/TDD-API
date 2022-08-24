@@ -1,9 +1,10 @@
 import React from 'react';
-import { render, screen,fireEvent } from '@testing-library/react';
+import { render, screen,fireEvent,waitFor  } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import SubmitGame from './SubmitGame'
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
+import {MemoryRouter} from 'react-router-dom'
 
 const allGames = [
     { id: 1, title: 'Elden Ring' }, 
@@ -18,84 +19,85 @@ const allGames = [
   
   ]
 
-
 const server = setupServer(
     rest.post('/games', (req, res, ctx) => {
+      try{
         let newGame={
-            id:allGames[2].id+1,
-            title:req.body.name
-        }
-        allGames.push(newGame)
-      return res(ctx.json({ games: allGames }));
+          id:allGames[2].id+1,
+          title:req.body.name
+      }
+      allGames.push(newGame)
+    return res(ctx.json({ games: allGames }));
+      }
+      catch(e){
+        console.error(e.message)
+      }
+    }),
+    rest.get('/login', (req, res, ctx) => {
+      try{
+        return res(ctx.json({ users }));
+      }
+      catch(e){
+        console.error(e.message)
+      }
     })
   );
-
-  beforeAll(() => server.listen());
+beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-
 test('Render the input field and button to create a new game if you are logged in',async()=>{
-  server.use(
-    rest.get('/login', (req, res, ctx) => {
-      return res(ctx.json({ users }));
-    })
-  );
-    render(<SubmitGame/>)
+    render(<MemoryRouter> <SubmitGame/></MemoryRouter>
+   )
     expect(await screen.getByPlaceholderText('Enter the game name...'))
-    expect(await screen.getByRole('button')).toHaveTextContent('Submit');
-
-    //expect(screen.getByRole('button').toHaveTextContent("Submit"));
-})
-
+    expect( screen.getByText(/submit/i)).toBeInTheDocument();
+  })
 
 test('Dont load if not logged in',async()=>{
   server.use(
     rest.get('/login', (req, res, ctx) => {
-      return res(ctx.status(401),ctx.json('Not logged in'));
+      try{
+        return res(ctx.status(401),ctx.json('Not logged in'));
+      }
+      catch(e){
+        console.error(e.message)
+      }
     })
   );
-    render(<SubmitGame/>)
+    render(<MemoryRouter> <SubmitGame/></MemoryRouter>)
     expect(await screen.findByText("You do not have permission to acesse this page")).toBeInTheDocument()
-
-    //expect(screen.getByRole('button').toHaveTextContent("Submit"));
 })
-
-
 
 test('Submit the values using the button and receveid the new array from the server',async ()=>{
-    render(<SubmitGame />)
+    render(<MemoryRouter> <SubmitGame/></MemoryRouter>)
     const nameField=screen.getByPlaceholderText('Enter the game name...')
-    const button=screen.getByRole('button')
-
+    const button=screen.getByText(/submit/i)
     fireEvent.change(nameField,{target:{value:'Zelda'}})
     fireEvent.click(button);
-
-    expect(await screen.findByText("Succesufully submited!")).toBeInTheDocument()
-  
-    //expect(screen.getByRole('button').toHaveTextContent("Submit"));
-})
+    await waitFor(() =>{expect( screen.getByTestId('test')).toHaveTextContent('"title":"Zelda"')})
+    expect(screen.getByTestId('location-display')).toHaveTextContent('/home')
+  })
 
 test('error on the server side',async ()=>{
-    
     server.use(
         rest.post('/games', (req, res, ctx) => {
-          return res(
-            ctx.status(500),
-            ctx.json({ message: 'Internal server error' }),
-          );
+          try{
+            dea
+          }
+          catch(e){
+            return res(
+              ctx.status(500),
+              ctx.json({ message: 'Internal server error' }),
+            );
+          }
         })
       );
-    render(<SubmitGame />)
+    render(<MemoryRouter> <SubmitGame/></MemoryRouter>)
     const nameField=screen.getByPlaceholderText('Enter the game name...')
     const button=screen.getByRole('button')
-
     fireEvent.change(nameField,{target:{value:'Zelda'}})
     fireEvent.click(button);
-
     expect(await screen.findByText("Failed to submit the game!")).toBeInTheDocument()
-  
-    //expect(screen.getByRole('button').toHaveTextContent("Submit"));
-})
+  })
 
 
