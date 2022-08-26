@@ -98,5 +98,4 @@ test('Server side error',async ()=>{
   fireEvent.change(passwordField,{target:{value:'senha'}})
   fireEvent.click(button);
   expect(await screen.findByText("Internal server error!")).toBeInTheDocument()
-
 }) 
