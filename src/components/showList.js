@@ -2,13 +2,18 @@ import { useState,useEffect } from "react";
 import axio from 'axios'
 
  const ShowList=()=>{
-
+  const instance = axio.create({
+    baseURL: 'https://radiant-garden-44368.herokuapp.com/',
+    withCredentials:true
+  }); 
     const [games,setGames]=useState([])
     const [searchGames,setSearchGames]=useState('')
 
     useEffect(()=>{
      const fetchGames=async ()=>{
-        const reponse=await axio.get('/games')
+       const reponse=await axio.get('/games')
+        const reponse2=await instance.get('/games')
+        console.log(reponse2.data,'responseeeeeeeeeeeee')
         setGames(reponse.data.games)
      }
      fetchGames()
