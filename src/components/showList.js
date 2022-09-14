@@ -11,10 +11,10 @@ import axio from 'axios'
 
     useEffect(()=>{
      const fetchGames=async ()=>{
-       const reponse=await axio.get('/games')
+       //const reponse=await axio.get('/games')
         const reponse2=await instance.get('/games')
         console.log(reponse2.data,'responseeeeeeeeeeeee')
-        setGames(reponse.data.games)
+        //setGames(reponse.data.games)
      }
      fetchGames()
     },[])
