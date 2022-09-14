@@ -12,6 +12,6 @@ test('full app rendering/navigating', async () => {
   // verify page content for expected route after navigating
    fireEvent.click(screen.getByText(/login/i))
    await expect(screen.getByText(/login page/i)).toBeInTheDocument()
-   expect(screen.getByTestId('location-display')).toHaveTextContent('/login')
+   expect(screen.getAllByTestId('location-display')[0]).toHaveTextContent('/login')
 
 })
