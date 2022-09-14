@@ -11,10 +11,7 @@ export const LocationDisplay = () => {
 export const App=()=> {
   return (
     <div className="App">
-
-    <Link to="/">Home</Link>
-<Link to="/login">Login</Link>
-<Link to="/submit">Submit</Link>
+<Nav/>
         <Routes>
         <Route exact path='/' element={<List/>} /> 
         <Route exact path='/submit' element={<Submit/>} />

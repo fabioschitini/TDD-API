@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen,fireEvent,waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import UpdateGames from './UpdateGames'
+import Login from './LogIn'
+import Nav from './Nav'
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import {Route,BrowserRouter as Router,MemoryRouter} from 'react-router-dom'
@@ -71,53 +73,79 @@ const server = setupServer(
   afterEach(() => server.resetHandlers());
   afterAll(() => server.close());
 
-  test('Render the input field and button,also the title input should have the value of the especifi game, and ',async()=>{
+  test('Submit the values using the button,and log',async ()=>{
+    render(<MemoryRouter><Login  /></MemoryRouter>)
+    const userNameField=screen.getByPlaceholderText('username')
+    const passwordField=screen.getByPlaceholderText('password')
+    const button=screen.getByText(/submit/i)
+    fireEvent.change(userNameField,{target:{value:'user1'}})
+    fireEvent.change(passwordField,{target:{value:'senha'}})
+    fireEvent.click(button);
+    await waitFor(() =>{expect( screen.getByTestId('test')).toHaveTextContent("user1")})
+    expect(screen.getByTestId('location-display')).toHaveTextContent('/home')
+  })
+
+/* test('Render the input field and button,also the title input should have the value of the especifi game, and ',async()=>{
         render(
-          <MemoryRouter initialEntries={["/games/1"]}>
+          <MemoryRouter initialEntries={["/games/632217046745b3f7a90b7900"]}>
       <UpdateGames />
     </MemoryRouter>
         )
-      expect(screen.getByTestId('location-display')).toHaveTextContent('/games/1')
-      expect(await screen.findByDisplayValue("Elden Ring")).toBeInTheDocument()
+      expect(screen.getByTestId('location-display')).toHaveTextContent('/games/632217046745b3f7a90b7900')
+      expect(await screen.findByDisplayValue("Zelda")).toBeInTheDocument()
       expect( screen.getByText(/submit/i)).toBeInTheDocument();
-  }) 
+  })  */
 
-  test('Dont load if not logged in', async () => {
-    server.use(
-      rest.get('/login', (req, res, ctx) => { 
-        return res(ctx.status(401),ctx.json('Not logged in'));
-      })
-    ); 
+/*  test('Update the game and return the new array with updated array and then navigate to /home',async()=>{
     render(
-      <MemoryRouter initialEntries={["/games/1"]}>
-      <UpdateGames />
-    </MemoryRouter>
-      )
-     expect(screen.getByText('You do not have permission to acesse this page')).toBeInTheDocument()
-   
-  }) 
-
-  test('Update the game and return the new array with updated array and then navigate to /home',async()=>{
-    render(
-      <MemoryRouter initialEntries={["/games/1"]}>
+      <MemoryRouter initialEntries={["/games/632217046745b3f7a90b7900"]}>
       <UpdateGames />
     </MemoryRouter>
     )
     const nameField=await  screen.findByLabelText('Title')
     const button= await screen.findByText(/submit/i)
-    fireEvent.change(nameField,{target:{value:'Sekiro'}})
+    fireEvent.change(nameField,{target:{value:'Sekiro3'}})
     fireEvent.click(button);
-    await waitFor(() =>{expect( screen.getByTestId('test')).toHaveTextContent('{"id":"1","title":"Sekiro"}')})
+    await waitFor(() =>{expect( screen.getByTestId('test')).toHaveTextContent('"title":"Sekiro3"')})
     expect(screen.getByTestId('location-display')).toHaveTextContent('/home')
-  })
+  })  */
 
-  test('When you click the delete button,delete the game and return new array', async() => {
-    render(<MemoryRouter initialEntries={['/games/1']}> <UpdateGames /> </MemoryRouter>)
+test('When you click the delete button,delete the game and return new array', async() => {
+    render(<MemoryRouter initialEntries={['/games/632217046745b3f7a90b7900']}> <UpdateGames /> </MemoryRouter>)
     const button= await screen.findByText(/delete/i)
     fireEvent.click(button)
-    await waitFor(() =>{expect( screen.getByTestId('test')).not.toHaveTextContent('{"id":"1","title":"Elden Ring"}')})
+    await waitFor(() =>{expect( screen.getByTestId('test')).not.toHaveTextContent('"title":"Sekiro"')})
+ 
+      //await waitFor(() =>{expect(screen.getByText('Are you sure that you want to Delete this token?')).toBeInTheDocument()})
+      //await waitFor(() =>{ expect(screen.getByText('Yes')).toBeInTheDocument() })
+      //await waitFor(() =>{expect(screen.getByText('No')).toBeInTheDocument()}) 
 
-      /* await waitFor(() =>{expect(screen.getByText('Are you sure that you want to Delete this token?')).toBeInTheDocument()})
-      await waitFor(() =>{ expect(screen.getByText('Yes')).toBeInTheDocument() })
-      await waitFor(() =>{expect(screen.getByText('No')).toBeInTheDocument()}) */
-    });
+    })  
+
+test('Dont show logout if the user is not loggend in',async()=>{
+
+      // server.use(
+       //  rest.get('/login', (req, res, ctx) => { 
+        //   return res(ctx.status(401),ctx.json('Not logged in'));
+        // })
+      // );  
+       render(<MemoryRouter><Nav /></MemoryRouter>);
+        expect(await screen.findByText("Logout")).toBeInTheDocument()
+       fireEvent.click(await screen.findByText("Logout"));
+       //await waitFor(() =>{ expect( screen.queryByText("Logout")).not.toBeInTheDocument() }) 
+     })      
+
+test('Dont load if not logged in', async () => {
+      server.use(
+        rest.get('/login', (req, res, ctx) => { 
+          return res(ctx.status(401),ctx.json('Not logged in'));
+        })
+      ); 
+      render(
+        <MemoryRouter initialEntries={["/games/1"]}>
+        <UpdateGames />
+      </MemoryRouter>
+        )
+       expect(screen.getByText('You do not have permission to acesse this page')).toBeInTheDocument()
+     
+    })    

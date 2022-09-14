@@ -55,7 +55,7 @@ test('Submit the values using the button,and log',async ()=>{
     fireEvent.change(userNameField,{target:{value:'user1'}})
     fireEvent.change(passwordField,{target:{value:'senha'}})
     fireEvent.click(button);
-    await waitFor(() =>{expect( screen.getByTestId('test')).toHaveTextContent('"username":"user1"')})
+    await waitFor(() =>{expect( screen.getByTestId('test')).toHaveTextContent("user1")})
     expect(screen.getByTestId('location-display')).toHaveTextContent('/home')
 })
 
@@ -81,7 +81,7 @@ test('Submit the wrong value for password and recevie apropiate response',async 
   expect(await screen.findByText("Password doesnt match!")).toBeInTheDocument()
 })
 
-test('Server side error',async ()=>{
+/* test('Server side error',async ()=>{
   server.use(
     rest.post('/login', (req, res, ctx) => {
       return res(
@@ -98,4 +98,4 @@ test('Server side error',async ()=>{
   fireEvent.change(passwordField,{target:{value:'senha'}})
   fireEvent.click(button);
   expect(await screen.findByText("Internal server error!")).toBeInTheDocument()
-}) 
+})   */

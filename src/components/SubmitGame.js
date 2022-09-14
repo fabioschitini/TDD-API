@@ -2,7 +2,10 @@ import { useState,useEffect } from "react";
 import axio from 'axios'
 import { LocationDisplay } from '../App';
 import {Link,useNavigate} from 'react-router-dom'
-
+const instance = axio.create({
+    baseURL: 'https://radiant-garden-44368.herokuapp.com/',
+    withCredentials:true
+  }); 
 const SubmitGames=()=>{
     const [name,setName]=useState()
     const [submitMessage,setSubmitMessage]=useState()
@@ -14,7 +17,7 @@ const SubmitGames=()=>{
     useEffect(()=>{
         const fetchUsers=async ()=>{
            try{
-               const response=await axio.get('/login')
+               const response=await instance.get('/login')
                setUsers(true)
                setUsers(response.data)
            }
@@ -27,19 +30,16 @@ const SubmitGames=()=>{
 
        const submit=async()=>{
 try{
-    const response=await axio.post('/games',{name})
+    const response=await instance.post('/games',{title:name})
     setSubmitMessage('Succesufully submited!')
-    setGames(JSON.stringify(response.data.games))
+    setGames(JSON.stringify(response.data))
     navigate('/home')
 }
 catch{
     setErrorMessage('Failed to submit the game!')
     console.log('fudeuuu')
 }
-
-
        }
-
 return(
     <div>
         {users&&    <div>

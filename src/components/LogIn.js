@@ -2,7 +2,10 @@ import { useState } from "react";
 import axio from 'axios'
 import { LocationDisplay } from '../App';
 import {useNavigate} from 'react-router-dom'
-
+ const instance = axio.create({
+    baseURL: 'https://radiant-garden-44368.herokuapp.com/',
+    withCredentials:true
+  }); 
 const Login=()=>{
     const [username,setUsername]=useState()
     const [password,setPassword]=useState()
@@ -12,8 +15,10 @@ const Login=()=>{
     const navigate=useNavigate()
 const submit=async ()=>{
     try{
-        const response=await axio.post('/login',{username,password})
-      setUsersList(JSON.stringify(response.data.users))
+        //const response=await axio.post('/login',{username,password})
+        const response2=await instance.post('/login',{username,password})
+        const fetchedUsername=await response2.data.username
+      setUsersList(fetchedUsername)
       navigate('/home')
      }
     catch(e){

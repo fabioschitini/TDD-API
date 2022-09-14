@@ -3,7 +3,10 @@ import axio from 'axios'
 import {useLocation ,Link,useNavigate} from 'react-router-dom'
 import { LocationDisplay } from '../App';
 
-
+const instance = axio.create({
+    baseURL: 'https://radiant-garden-44368.herokuapp.com/',
+    withCredentials:true
+  }); 
 const UpdateGames=()=>{
     const [submitMessage,setSubmitMessage]=useState()
     const [errorMessage,setErrorMessage]=useState()
@@ -16,7 +19,7 @@ const UpdateGames=()=>{
     useEffect(()=>{
         const fetchUsers=async ()=>{
             try{
-                const response=await axio.get('/login')
+                const response=await instance.get('/login')
                 setUsers(response.data)
             }
             catch(e){
@@ -27,7 +30,9 @@ const UpdateGames=()=>{
         const fetchGame=async()=>{
             try{
                 const response=await axio.get('/games')
-                let filteredGame=response.data.allGames.filter(game=>game.id===filteredId)[0]
+                const response2=await instance.get('/games')
+                let filteredGame=response2.data.filter(game=>game._id===filteredId)[0]
+                setGames(response2.data)
                 setTitle(filteredGame.title)
             }
             catch(e){
@@ -39,10 +44,10 @@ const UpdateGames=()=>{
        },[])
 const submit=async ()=>{
     try{
-       const response=await axio.put('games',{title,id:filteredId})
+       const response=await instance.put(`/game/${filteredId}`,{title})
         setSubmitMessage('Succesully updated!')
-        console.log(response.data.games,'updated response')
-        setGames(JSON.stringify(response.data.games))
+        console.log(response.data,'updated response')
+        setGames(JSON.stringify(response.data))
         navigate('/home')
     }
     catch(e){
@@ -51,10 +56,12 @@ const submit=async ()=>{
     }
 }
 
-const Delete=async()=>{
+const Delete=async()=>{ 
     try{
-        const response=await axio.delete(`games/${filteredId}`,{title,id:filteredId})
-        setGames(JSON.stringify(response.data.games))
+        console.log(filteredId, 'fuckkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk youuuuuuuuuuuuuuuu')
+        const response=await instance.post(`games/delete/${filteredId}`)
+        console.log(response.data,'deleteeeeeeeeeeeeeeee responseeeeeeeeeeeeeeeeee')
+        setGames(JSON.stringify(response.data))
         navigate('/home')
      }
      catch(e){
