@@ -19,18 +19,22 @@ const UpdateGames=()=>{
     useEffect(()=>{
         const fetchUsers=async ()=>{
             try{
-                const response=await instance.get('/login')
+                console.log('begginig of users',users)
+                const response=await axio.get('https://radiant-garden-44368.herokuapp.com/login')
                 setUsers(response.data)
+                setUsers(true)
+                console.log(users)
+
             }
             catch(e){
-                console.error(e.message)
                 setUsers(false)     
+                console.error(e.message)
             }
          }
         const fetchGame=async()=>{
             try{
-                const response=await axio.get('/games')
-                const response2=await instance.get('/games')
+                //const response=await axio.get('/games')
+                const response2=await axio.get('https://radiant-garden-44368.herokuapp.com/games')
                 let filteredGame=response2.data.filter(game=>game._id===filteredId)[0]
                 setGames(response2.data)
                 setTitle(filteredGame.title)
@@ -44,7 +48,7 @@ const UpdateGames=()=>{
        },[])
 const submit=async ()=>{
     try{
-       const response=await instance.put(`/game/${filteredId}`,{title})
+       const response=await axio.put(`https://radiant-garden-44368.herokuapp.com/game/${filteredId}`,{title})
         setSubmitMessage('Succesully updated!')
         console.log(response.data,'updated response')
         setGames(JSON.stringify(response.data))
@@ -58,9 +62,9 @@ const submit=async ()=>{
 
 const Delete=async()=>{ 
     try{
-        console.log(filteredId, 'fuckkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk youuuuuuuuuuuuuuuu')
-        const response=await instance.post(`games/delete/${filteredId}`)
-        console.log(response.data,'deleteeeeeeeeeeeeeeee responseeeeeeeeeeeeeeeeee')
+        //console.log(filteredId, 'fuckkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk youuuuuuuuuuuuuuuu')
+        const response=await axio.post(`https://radiant-garden-44368.herokuapp.com/games/delete/${filteredId}`)
+        //console.log(response.data,'deleteeeeeeeeeeeeeeee responseeeeeeeeeeeeeeeeee')
         setGames(JSON.stringify(response.data))
         navigate('/home')
      }
@@ -77,11 +81,12 @@ const Delete=async()=>{
                 <label htmlFor='title'>Title</label>
 <input id='title' onChange={(e)=>setTitle(e.target.value)} value={title}/>
 <button onClick={submit}>Submit</button>
+<div  style={{display:'none'}} data-testid="test">{games}</div>
+      <button onClick={Delete}>Delete</button>
                  </div>}
       {!users&&<h1>You do not have permission to acesse this page</h1>}  
       {submitMessage}
-      <div  style={{display:'none'}} data-testid="test">{games}</div>
-      <button onClick={Delete}>Delete</button>
+    
       <LocationDisplay/>
         </div>
     )

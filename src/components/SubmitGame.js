@@ -10,7 +10,7 @@ const SubmitGames=()=>{
     const [name,setName]=useState()
     const [submitMessage,setSubmitMessage]=useState()
     const [errorMessage,setErrorMessage]=useState()
-    const [users,setUsers]=useState(true)
+    const [users,setUsers]=useState(false)
     const [games,setGames]=useState('yolo')
 
     const navigate=useNavigate()

@@ -44,7 +44,7 @@ const server = setupServer(
       }
     })
   );
-beforeAll(() => server.listen());
+  beforeAll(() => server.listen({onUnhandledRequest:'bypass'}));
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
@@ -100,7 +100,7 @@ test('Submit the values using the button and receveid the new array from the ser
     expect(await screen.findByText("Failed to submit the game!")).toBeInTheDocument()
   }) */
 
-test('Dont show logout if the user is not loggend in',async()=>{
+test('Log out and then see if the na isnt shwoing the logout button',async()=>{
 
     // server.use(
      //  rest.get('/login', (req, res, ctx) => { 

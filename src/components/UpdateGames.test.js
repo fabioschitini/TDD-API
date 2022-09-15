@@ -8,6 +8,12 @@ import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import {Route,BrowserRouter as Router,MemoryRouter} from 'react-router-dom'
 
+
+const instance = axio.create({
+  baseURL: 'https://radiant-garden-44368.herokuapp.com/',
+  withCredentials:true
+}); 
+
 const allGames = [
     { id: '1', title: 'Elden Ring' }, 
     { id: '2', title: 'Dark Souls' }, 
@@ -69,11 +75,11 @@ const server = setupServer(
     })
   );
 
-  beforeAll(() => server.listen());
+  beforeAll(() => server.listen({onUnhandledRequest:'bypass'}));
   afterEach(() => server.resetHandlers());
   afterAll(() => server.close());
 
-  test('Submit the values using the button,and log',async ()=>{
+ /*  test('Submit the values using the button,and log',async ()=>{
     render(<MemoryRouter><Login  /></MemoryRouter>)
     const userNameField=screen.getByPlaceholderText('username')
     const passwordField=screen.getByPlaceholderText('password')
@@ -84,21 +90,38 @@ const server = setupServer(
     await waitFor(() =>{expect( screen.getByTestId('test')).toHaveTextContent("user1")})
     expect(screen.getByTestId('location-display')).toHaveTextContent('/home')
   })
+ */
+
+/*   test('Submit the values using the button and receveid the new array from the server',async ()=>{
+    render(<MemoryRouter> <SubmitGame/></MemoryRouter>)
+    const nameField=screen.getByPlaceholderText('Enter the game name...')
+    const button=screen.getByText(/submit/i)
+    fireEvent.change(nameField,{target:{value:'Zelda'}})
+    fireEvent.click(button);
+    await waitFor(() =>{expect( screen.getByTestId('test')).toHaveTextContent('"title":"Zelda"')})
+    expect(screen.getByTestId('location-display')).toHaveTextContent('/home')
+  }) */
 
 /* test('Render the input field and button,also the title input should have the value of the especifi game, and ',async()=>{
+
+  const gamesList= await instance.get('/games')
+  testGame=gamesList.data.filter(game=>game.title="Zelda")[0]
+
         render(
-          <MemoryRouter initialEntries={["/games/632217046745b3f7a90b7900"]}>
+          <MemoryRouter initialEntries={[`/games/${testGame._id}`]}>
       <UpdateGames />
     </MemoryRouter>
         )
-      expect(screen.getByTestId('location-display')).toHaveTextContent('/games/632217046745b3f7a90b7900')
+      expect(screen.getByTestId('location-display')).toHaveTextContent(`/games/${testGame._id}`)
       expect(await screen.findByDisplayValue("Zelda")).toBeInTheDocument()
       expect( screen.getByText(/submit/i)).toBeInTheDocument();
   })  */
 
 /*  test('Update the game and return the new array with updated array and then navigate to /home',async()=>{
+   const gamesList= await instance.get('/games')
+  testGame=gamesList.data.filter(game=>game.title="Zelda")[0]
     render(
-      <MemoryRouter initialEntries={["/games/632217046745b3f7a90b7900"]}>
+      <MemoryRouter initialEntries={[`/games/${testGame._id}`]}>
       <UpdateGames />
     </MemoryRouter>
     )
@@ -110,19 +133,21 @@ const server = setupServer(
     expect(screen.getByTestId('location-display')).toHaveTextContent('/home')
   })  */
 
-test('When you click the delete button,delete the game and return new array', async() => {
-    render(<MemoryRouter initialEntries={['/games/632217046745b3f7a90b7900']}> <UpdateGames /> </MemoryRouter>)
+/* test('When you click the delete button,delete the game and return new array', async() => {
+   const gamesList= await instance.get('/games')
+  testGame=gamesList.data.filter(game=>game.title="Zelda")[0]
+    render(<MemoryRouter initialEntries={[`/games/${testGame._id}`]}> <UpdateGames /> </MemoryRouter>)
     const button= await screen.findByText(/delete/i)
-    fireEvent.click(button)
+    fireEvent.click(button)  
     await waitFor(() =>{expect( screen.getByTestId('test')).not.toHaveTextContent('"title":"Sekiro"')})
  
       //await waitFor(() =>{expect(screen.getByText('Are you sure that you want to Delete this token?')).toBeInTheDocument()})
       //await waitFor(() =>{ expect(screen.getByText('Yes')).toBeInTheDocument() })
       //await waitFor(() =>{expect(screen.getByText('No')).toBeInTheDocument()}) 
 
-    })  
+    })  */  
 
-test('Dont show logout if the user is not loggend in',async()=>{
+/* test('Dont show logout if the user is not loggend in',async()=>{
 
       // server.use(
        //  rest.get('/login', (req, res, ctx) => { 
@@ -148,4 +173,4 @@ test('Dont load if not logged in', async () => {
         )
        expect(screen.getByText('You do not have permission to acesse this page')).toBeInTheDocument()
      
-    })    
+    })     */
