@@ -2,12 +2,18 @@ import React from 'react';
 import { render, screen,fireEvent,waitFor  } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import SubmitGame from './SubmitGame'
+import UpdateGames from './UpdateGames'
 import Login from './LogIn'
 import Nav from './Nav'
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import {MemoryRouter} from 'react-router-dom'
+import axio from 'axios'
 
+const instance = axio.create({
+  baseURL: 'https://radiant-garden-44368.herokuapp.com/',
+  withCredentials:true
+}); 
 const allGames = [
     { id: 1, title: 'Elden Ring' }, 
     { id: 2, title: 'Dark Souls' }, 
@@ -48,6 +54,8 @@ const server = setupServer(
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
+const createdGame='Fodase';
+
 
 test('Submit the values using the button,and log',async ()=>{
   render(<MemoryRouter><Login  /></MemoryRouter>)
@@ -61,12 +69,44 @@ test('Submit the values using the button,and log',async ()=>{
   expect(screen.getByTestId('location-display')).toHaveTextContent('/home')
 })
 
-test('Render the input field and button to create a new game if you are logged in',async()=>{
-    render(<MemoryRouter> <SubmitGame/></MemoryRouter>
-   )
-    expect(await screen.getByPlaceholderText('Enter the game name...'))
-    expect( screen.getByText(/submit/i)).toBeInTheDocument();
-  })
+test('Submit the values using the button and receveid the new array from the server',async ()=>{
+  render(<MemoryRouter> <SubmitGame/></MemoryRouter>)
+
+   const nameField=await screen.findByPlaceholderText(/Enter the game name.../i) 
+       const button=screen.getByText(/submit/i)
+  fireEvent.change(nameField,{target:{value:`${createdGame}`}})
+  fireEvent.click(button);
+  await waitFor(() =>{expect( screen.getByTestId('test')).toHaveTextContent(`"title":"${createdGame}"`)})
+  expect(screen.getByTestId('location-display')).toHaveTextContent('/home') 
+})
+
+test('When you click the delete button,delete the game and return new array', async() => {
+  const gamesList= await instance.get('/games')
+ const testGame=gamesList.data.filter(game=>game.title==`${createdGame}`)[0]
+ if(testGame){
+   render(<MemoryRouter initialEntries={[`/games/${testGame._id}`]}> <UpdateGames /> </MemoryRouter>)
+   const button= await screen.findByText(/delete/i)
+   fireEvent.click(button)  
+   await waitFor(() =>{expect( screen.getByTestId('test')).not.toHaveTextContent(`"title":"${createdGame}"`)})
+ }
+})
+
+ test('Log out',async()=>{
+
+     // server.use(
+      //  rest.get('/login', (req, res, ctx) => { 
+       //   return res(ctx.status(401),ctx.json('Not logged in'));
+       // })
+     // );  
+      render(<MemoryRouter><Nav /></MemoryRouter>);
+       expect(await screen.findByText("Logout")).toBeInTheDocument()
+      fireEvent.click(await screen.findByText("Logout"));
+      await waitFor(() =>{ expect( screen.queryByText("Logout")).not.toBeInTheDocument() }) 
+    }) 
+ 
+ 
+/*  
+
 
 test('Submit the values using the button and receveid the new array from the server',async ()=>{
     render(<MemoryRouter> <SubmitGame/></MemoryRouter>)
@@ -100,7 +140,7 @@ test('Submit the values using the button and receveid the new array from the ser
     expect(await screen.findByText("Failed to submit the game!")).toBeInTheDocument()
   }) */
 
-test('Log out and then see if the na isnt shwoing the logout button',async()=>{
+/*   test('Log out',async()=>{
 
     // server.use(
      //  rest.get('/login', (req, res, ctx) => { 
@@ -110,10 +150,10 @@ test('Log out and then see if the na isnt shwoing the logout button',async()=>{
      render(<MemoryRouter><Nav /></MemoryRouter>);
       expect(await screen.findByText("Logout")).toBeInTheDocument()
      fireEvent.click(await screen.findByText("Logout"));
-     //await waitFor(() =>{ expect( screen.queryByText("Logout")).not.toBeInTheDocument() }) 
-   }) 
+     await waitFor(() =>{ expect( screen.queryByText("Logout")).not.toBeInTheDocument() }) 
+   })  */
 
-test('Dont load if not logged in',async()=>{
+/* test('Dont load if not logged in',async()=>{
     server.use(
       rest.get('/login', (req, res, ctx) => {
         try{
@@ -126,5 +166,5 @@ test('Dont load if not logged in',async()=>{
     );
       render(<MemoryRouter> <SubmitGame/></MemoryRouter>)
       expect(await screen.findByText("You do not have permission to acesse this page")).toBeInTheDocument()
-  }) 
+  })   */
 

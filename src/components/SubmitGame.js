@@ -17,8 +17,10 @@ const SubmitGames=()=>{
     useEffect(()=>{
         const fetchUsers=async ()=>{
            try{
+            console.log('fecthin usersssssssssssss')
                const response=await instance.get('/login')
                setUsers(true)
+               console.log('loginnnnnnnnnnn')
                setUsers(response.data)
            }
            catch(e){

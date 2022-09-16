@@ -24,9 +24,16 @@ const Nav=()=>{
     },[])
 
     const LogOut=async()=>{
-        console.log('logging out')
-        const repsponse2=await instance.post('/logout')
-        console.log('nyannnnnnnnnnnnnnnnnnnnnnnn')
+        try{
+            console.log('logging out')
+            const repsponse2=await instance.post('/logout')
+            console.log('nyannnnnnnnnnnnnnnnnnnnnnnn')
+            setUsers(false)
+        }
+        catch(e){
+            console.error(e.message)
+        }
+   
     }
 
     return(
